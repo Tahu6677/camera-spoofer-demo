@@ -19,13 +19,13 @@ jobs:
           node-version: '18'
 
       - name: Install NativeScript CLI
-        run: npm install -g @nativescript/cli
+        run: npm install -g nativescript
 
       - name: Install dependencies
         run: npm install
 
       - name: Add Android platform (if not already added)
-        run: ns platform add android || echo "Platform already added"
+        run: ns platform add android || echo "Android platform already exists."
 
       - name: Build Android APK (release)
         run: ns build android --release --no-sign
