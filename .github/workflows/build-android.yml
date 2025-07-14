@@ -2,8 +2,7 @@ name: Build NativeScript Android APK
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   Build-APK:
@@ -11,21 +10,24 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Install NativeScript CLI
         run: npm install -g nativescript
 
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Install dependencies
         run: npm install
 
-      - name: Add Android platform (if not already added)
-        run: ns platform add android || echo "Android platform already exists."
+      - name: Add Android platform
+        run: ns platform add android
 
       - name: Build Android APK (release)
         run: ns build android --release --no-sign
@@ -33,5 +35,5 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: camera-spoofer-apk
-          path: platforms/android/app/build/outputs/**/*.apk
+          name: unsigned-apk
+          path: platforms/android/app/build/outputs/apk/release/*.apk
