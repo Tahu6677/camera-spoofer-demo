@@ -24,11 +24,14 @@ jobs:
       - name: Install project dependencies
         run: npm install
 
-      - name: Build Android APK
+      - name: Add Android platform (if not already added)
+        run: ns platform add android || echo "Platform already added"
+
+      - name: Build Android APK (Release)
         run: ns build android --release --no-sign
 
-      - name: Upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v3
         with:
           name: camera-spoofer-apk
-          path: platforms/android/app/build/outputs/apk/release/*.apk
+          path: platforms/android/app/build/outputs/**/*.apk
