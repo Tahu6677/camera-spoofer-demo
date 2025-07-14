@@ -29,8 +29,9 @@ jobs:
       - name: Add Android platform
         run: npx nativescript platform add android
 
-      - name: Build Android APK (release)
-        run: npx nativescript build android --release --no-sign
+      - name: Build Android APK (debug)
+        run: npx nativescript build android
+
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
