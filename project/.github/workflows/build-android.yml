@@ -1,0 +1,97 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
+    - name: Install Android SDK components
+      run: |
+        sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+        sdkmanager "ndk;25.2.9519653"
+        
+    - name: Install NativeScript CLI
+      run: npm install -g @nativescript/cli
+      
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Add Android platform
+      run: ns platform add android
+      
+    - name: Build Android APK (Debug)
+      run: ns build android --env.production
+      
+    - name: Build Android APK (Release)
+      run: ns build android --release --env.production
+      continue-on-error: true
+      
+    - name: Find APK files
+      run: |
+        find . -name "*.apk" -type f
+        ls -la platforms/android/app/build/outputs/apk/ || true
+        
+    - name: Upload Debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: camera-spoofer-debug-apk
+        path: platforms/android/app/build/outputs/apk/debug/*.apk
+        if-no-files-found: warn
+        
+    - name: Upload Release APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: camera-spoofer-release-apk
+        path: platforms/android/app/build/outputs/apk/release/*.apk
+        if-no-files-found: ignore
+        
+    - name: Create Release
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ github.run_number }}
+        name: Camera Spoofer Demo v${{ github.run_number }}
+        body: |
+          Automated build of Camera Spoofer Demo
+          
+          **Installation:**
+          1. Download the APK file
+          2. Enable "Unknown Sources" in Android settings
+          3. Install on your rooted device with LSPosed
+          
+          **Build Info:**
+          - Commit: ${{ github.sha }}
+          - Build: #${{ github.run_number }}
+          - Date: ${{ github.event.head_commit.timestamp }}
+        files: |
+          platforms/android/app/build/outputs/apk/debug/*.apk
+          platforms/android/app/build/outputs/apk/release/*.apk
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

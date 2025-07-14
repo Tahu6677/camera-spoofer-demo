@@ -1,0 +1,334 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="navigatingTo">
+    <ActionBar title="Camera Spoofer Demo" class="bg-gray-900 text-white" />
+
+    <TabView selectedIndexChanged="onTabChanged" class="bg-gray-50">
+        <!-- Control Panel Tab -->
+        <TabViewItem title="Control Panel">
+            <ScrollView>
+                <StackLayout class="p-4 space-y-4">
+                    <!-- Status Dashboard -->
+                    <StackLayout class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                        <Label text="System Status" class="text-xl font-bold text-gray-800 mb-3" />
+                        
+                        <GridLayout columns="*, auto" class="mb-3">
+                            <Label text="Camera Spoofer" class="text-lg text-gray-700" col="0" />
+                            <Switch checked="{{ spoofingEnabled }}" tap="{{ onToggleSpoofer }}" 
+                                    class="switch-primary" col="1" />
+                        </GridLayout>
+                        
+                        <StackLayout class="bg-gray-50 rounded p-3 mb-3">
+                            <Label text="Status:" class="text-sm text-gray-600 mb-1" />
+                            <Label text="{{ connectionStatus }}" class="text-lg font-semibold" 
+                                   style="color: {{ getStatusColor() }}" />
+                        </StackLayout>
+                        
+                        <StackLayout class="bg-gray-50 rounded p-3">
+                            <Label text="Current Mode:" class="text-sm text-gray-600 mb-1" />
+                            <Label text="{{ getModeDisplayName(currentMode) }}" 
+                                   class="text-lg font-semibold text-gray-800" />
+                        </StackLayout>
+                    </StackLayout>
+
+                    <!-- Mode Selection -->
+                    <StackLayout class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                        <Label text="Spoofing Mode" class="text-xl font-bold text-gray-800 mb-3" />
+                        
+                        <Button text="📷 Gallery Photo" tag="gallery_photo" tap="{{ onModeSelected }}"
+                                class="btn btn-outline mb-2 text-left" />
+                        <Button text="🎥 Gallery Video" tag="gallery_video" tap="{{ onModeSelected }}"
+                                class="btn btn-outline mb-2 text-left" />
+                        <Button text="📡 OBS Stream" tag="obs_stream" tap="{{ onModeSelected }}"
+                                class="btn btn-outline mb-2 text-left" />
+                    </StackLayout>
+
+                    <!-- Media Selection (Gallery Modes) -->
+                    <StackLayout class="bg-white rounded-lg p-4 shadow-sm border border-gray-200"
+                                 visibility="{{ currentMode === 'gallery_photo' || currentMode === 'gallery_video' ? 'visible' : 'collapsed' }}">
+                        <Label text="Media Selection" class="text-xl font-bold text-gray-800 mb-3" />
+                        
+                        <Button text="📁 Select from Gallery" tap="{{ onSelectMedia }}"
+                                class="btn btn-primary mb-3" />
+                        
+                        <StackLayout visibility="{{ selectedMedia ? 'visible' : 'collapsed' }}"
+                                     class="bg-gray-50 rounded p-3">
+                            <Label text="Selected:" class="text-sm text-gray-600 mb-1" />
+                            <Label text="{{ selectedMedia ? selectedMedia.thumbnail + ' ' + selectedMedia.name : '' }}" 
+                                   class="text-lg font-semibold text-gray-800" />
+                            <Label text="{{ selectedMedia ? selectedMedia.path : '' }}" 
+                                   class="text-sm text-gray-500" textWrap="true" />
+                        </StackLayout>
+                    </StackLayout>
+
+                    <!-- OBS Stream Configuration -->
+                    <StackLayout class="bg-white rounded-lg p-4 shadow-sm border border-gray-200"
+                                 visibility="{{ currentMode === 'obs_stream' ? 'visible' : 'collapsed' }}">
+                        <Label text="OBS Stream Setup" class="text-xl font-bold text-gray-800 mb-3" />
+                        
+                        <Label text="Stream URL:" class="text-sm text-gray-600 mb-1" />
+                        <TextField text="{{ obsStreamUrl }}" class="input mb-3" hint="rtmp://localhost:1935/live" />
+                        
+                        <Label text="Stream Key:" class="text-sm text-gray-600 mb-1" />
+                        <TextField text="{{ obsStreamKey }}" textChange="{{ onStreamKeyChanged }}"
+                                   class="input mb-3" hint="Enter your OBS stream key" />
+                        
+                        <Button text="🔗 Connect to OBS" tap="{{ onConnectOBS }}"
+                                class="btn btn-primary" />
+                    </StackLayout>
+
+                    <!-- Live Preview -->
+                    <StackLayout class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                        <Label text="Live Preview" class="text-xl font-bold text-gray-800 mb-3" />
+                        
+                        <StackLayout class="bg-gray-900 rounded-lg h-48 flex items-center justify-center">
+                            <Label text="📹" class="text-6xl mb-2" />
+                            <Label text="{{ spoofingEnabled ? 'Spoofed Feed Active' : 'Camera Feed Disabled' }}" 
+                                   class="text-white text-center" />
+                            <Label text="{{ spoofingEnabled ? connectionStatus : 'Enable spoofer to see preview' }}" 
+                                   class="text-gray-300 text-sm text-center mt-1" />
+                        </StackLayout>
+                    </StackLayout>
+                </StackLayout>
+            </ScrollView>
+        </TabViewItem>
+
+        <!-- Project Overview Tab -->
+        <TabViewItem title="Overview">
+            <ScrollView>
+                <StackLayout class="p-4 space-y-4">
+                    <StackLayout class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                        <Label text="🎓 Academic Research Project" class="text-2xl font-bold text-gray-800 mb-3" />
+                        
+                        <Label text="Camera Virtualization &amp; Media Manipulation Study" 
+                               class="text-lg text-gray-700 mb-4" textWrap="true" />
+                        
+                        <Label text="This proof-of-concept demonstrates advanced Android system manipulation techniques for educational purposes, including:" 
+                               class="text-gray-600 mb-3" textWrap="true" />
+                        
+                        <StackLayout class="ml-4 space-y-2">
+                            <Label text="• Camera2 API interception and redirection" 
+                                   class="text-gray-700" textWrap="true" />
+                            <Label text="• Media stream injection via LSPosed modules" 
+                                   class="text-gray-700" textWrap="true" />
+                            <Label text="• Real-time OBS integration for live streaming" 
+                                   class="text-gray-700" textWrap="true" />
+                            <Label text="• System-level permission management" 
+                                   class="text-gray-700" textWrap="true" />
+                        </StackLayout>
+                    </StackLayout>
+
+                    <StackLayout class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                        <Label text="🏗️ System Architecture" class="text-xl font-bold text-gray-800 mb-3" />
+                        
+                        <StackLayout class="bg-gray-50 rounded p-3 mb-3">
+                            <Label text="Frontend Layer" class="font-semibold text-gray-800 mb-1" />
+                            <Label text="NativeScript UI for control and demonstration" 
+                                   class="text-sm text-gray-600" textWrap="true" />
+                        </StackLayout>
+                        
+                        <StackLayout class="bg-gray-50 rounded p-3 mb-3">
+                            <Label text="Middleware Layer" class="font-semibold text-gray-800 mb-1" />
+                            <Label text="LSPosed modules for system hook injection" 
+                                   class="text-sm text-gray-600" textWrap="true" />
+                        </StackLayout>
+                        
+                        <StackLayout class="bg-gray-50 rounded p-3">
+                            <Label text="System Layer" class="font-semibold text-gray-800 mb-1" />
+                            <Label text="Android Camera2 API, Media Framework, Root Access" 
+                                   class="text-sm text-gray-600" textWrap="true" />
+                        </StackLayout>
+                    </StackLayout>
+
+                    <StackLayout class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                        <Label text="🛠️ Technical Stack" class="text-xl font-bold text-gray-800 mb-3" />
+                        
+                        <GridLayout columns="*, *" class="space-y-2">
+                            <StackLayout col="0" class="pr-2">
+                                <Label text="Development:" class="font-semibold text-gray-800 mb-1" />
+                                <Label text="• Android Studio" class="text-sm text-gray-600" />
+                                <Label text="• NativeScript" class="text-sm text-gray-600" />
+                                <Label text="• TypeScript/Java" class="text-sm text-gray-600" />
+                                <Label text="• Smali/Dalvik" class="text-sm text-gray-600" />
+                            </StackLayout>
+                            
+                            <StackLayout col="1" class="pl-2">
+                                <Label text="System Tools:" class="font-semibold text-gray-800 mb-1" />
+                                <Label text="• LSPosed Framework" class="text-sm text-gray-600" />
+                                <Label text="• Magisk Modules" class="text-sm text-gray-600" />
+                                <Label text="• ADB/Fastboot" class="text-sm text-gray-600" />
+                                <Label text="• ApkTool/JADX" class="text-sm text-gray-600" />
+                            </StackLayout>
+                        </GridLayout>
+                    </StackLayout>
+                </StackLayout>
+            </ScrollView>
+        </TabViewItem>
+
+        <!-- Documentation Tab -->
+        <TabViewItem title="Documentation">
+            <ScrollView>
+                <StackLayout class="p-4 space-y-4">
+                    <StackLayout class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                        <Label text="📚 Technical Implementation" class="text-xl font-bold text-gray-800 mb-3" />
+                        
+                        <Label text="LSPosed Module Development" class="text-lg font-semibold text-gray-800 mb-2" />
+                        <Label text="Custom hooks targeting Android's Camera2 API to intercept and redirect media streams. Implementation involves:" 
+                               class="text-gray-600 mb-3" textWrap="true" />
+                        
+                        <StackLayout class="bg-gray-900 rounded p-3 mb-4">
+                            <Label text="// Example hook implementation" class="text-green-400 text-sm mb-1" />
+                            <Label text="XposedHelpers.findAndHookMethod(" class="text-white text-sm font-mono" />
+                            <Label text="  CameraDevice.class, &quot;createCaptureSession&quot;," class="text-white text-sm font-mono ml-2" />
+                            <Label text="  new XC_MethodHook() { ... }" class="text-white text-sm font-mono ml-2" />
+                            <Label text=");" class="text-white text-sm font-mono" />
+                        </StackLayout>
+                        
+                        <Label text="Smali Patching Techniques" class="text-lg font-semibold text-gray-800 mb-2" />
+                        <Label text="Direct bytecode modification for deeper system integration and bypass mechanisms." 
+                               class="text-gray-600 mb-3" textWrap="true" />
+                        
+                        <Label text="Media Stream Redirection" class="text-lg font-semibold text-gray-800 mb-2" />
+                        <Label text="Implementation of virtual camera devices that can source from gallery files or external streams like OBS." 
+                               class="text-gray-600" textWrap="true" />
+                    </StackLayout>
+
+                    <StackLayout class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                        <Label text="🔧 Development Workflow" class="text-xl font-bold text-gray-800 mb-3" />
+                        
+                        <StackLayout class="space-y-3">
+                            <StackLayout class="border-l-4 border-blue-500 pl-3">
+                                <Label text="1. Environment Setup" class="font-semibold text-gray-800" />
+                                <Label text="Configure rooted LDPlayer with Magisk and LSPosed framework" 
+                                       class="text-sm text-gray-600" textWrap="true" />
+                            </StackLayout>
+                            
+                            <StackLayout class="border-l-4 border-blue-500 pl-3">
+                                <Label text="2. Target Analysis" class="font-semibold text-gray-800" />
+                                <Label text="Reverse engineer target applications using JADX and identify camera API usage patterns" 
+                                       class="text-sm text-gray-600" textWrap="true" />
+                            </StackLayout>
+                            
+                            <StackLayout class="border-l-4 border-blue-500 pl-3">
+                                <Label text="3. Hook Development" class="font-semibold text-gray-800" />
+                                <Label text="Create LSPosed modules to intercept camera calls and inject custom media streams" 
+                                       class="text-sm text-gray-600" textWrap="true" />
+                            </StackLayout>
+                            
+                            <StackLayout class="border-l-4 border-blue-500 pl-3">
+                                <Label text="4. Testing &amp; Validation" class="font-semibold text-gray-800" />
+                                <Label text="Verify functionality in sandboxed environment with various target applications" 
+                                       class="text-sm text-gray-600" textWrap="true" />
+                            </StackLayout>
+                        </StackLayout>
+                    </StackLayout>
+
+                    <StackLayout class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                        <Label text="📊 Research Findings" class="text-xl font-bold text-gray-800 mb-3" />
+                        
+                        <Label text="Key Discoveries:" class="text-lg font-semibold text-gray-800 mb-2" />
+                        <StackLayout class="ml-4 space-y-2">
+                            <Label text="• Camera2 API provides multiple interception points" 
+                                   class="text-gray-700" textWrap="true" />
+                            <Label text="• LSPosed offers superior hook stability vs traditional Xposed" 
+                                   class="text-gray-700" textWrap="true" />
+                            <Label text="• Media format conversion crucial for seamless injection" 
+                                   class="text-gray-700" textWrap="true" />
+                            <Label text="• Root detection bypass requires multi-layered approach" 
+                                   class="text-gray-700" textWrap="true" />
+                        </StackLayout>
+                    </StackLayout>
+                </StackLayout>
+            </ScrollView>
+        </TabViewItem>
+
+        <!-- Ethics & Legal Tab -->
+        <TabViewItem title="Ethics">
+            <ScrollView>
+                <StackLayout class="p-4 space-y-4">
+                    <StackLayout class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                        <Label text="⚖️ Legal &amp; Ethical Framework" class="text-2xl font-bold text-gray-800 mb-3" />
+                        
+                        <StackLayout class="bg-yellow-50 border border-yellow-200 rounded p-3 mb-4">
+                            <Label text="⚠️ ACADEMIC USE ONLY" class="text-yellow-800 font-bold mb-2" />
+                            <Label text="This project is developed strictly for educational and research purposes as part of a computer science capstone program." 
+                                   class="text-yellow-700" textWrap="true" />
+                        </StackLayout>
+                    </StackLayout>
+
+                    <StackLayout class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                        <Label text="🎯 Research Objectives" class="text-xl font-bold text-gray-800 mb-3" />
+                        
+                        <StackLayout class="space-y-3">
+                            <StackLayout class="bg-green-50 border border-green-200 rounded p-3">
+                                <Label text="✅ Educational Goals" class="text-green-800 font-semibold mb-1" />
+                                <Label text="• Understanding Android security mechanisms" class="text-green-700" />
+                                <Label text="• Learning system-level programming techniques" class="text-green-700" />
+                                <Label text="• Exploring media framework internals" class="text-green-700" />
+                                <Label text="• Demonstrating ethical hacking principles" class="text-green-700" />
+                            </StackLayout>
+                        </StackLayout>
+                    </StackLayout>
+
+                    <StackLayout class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                        <Label text="🛡️ Ethical Guidelines" class="text-xl font-bold text-gray-800 mb-3" />
+                        
+                        <StackLayout class="space-y-3">
+                            <StackLayout class="border-l-4 border-green-500 pl-3">
+                                <Label text="Sandboxed Environment" class="font-semibold text-gray-800" />
+                                <Label text="All testing conducted in isolated emulator environments with no external network access" 
+                                       class="text-sm text-gray-600" textWrap="true" />
+                            </StackLayout>
+                            
+                            <StackLayout class="border-l-4 border-green-500 pl-3">
+                                <Label text="No Malicious Intent" class="font-semibold text-gray-800" />
+                                <Label text="Research focused on understanding security mechanisms, not exploiting them" 
+                                       class="text-sm text-gray-600" textWrap="true" />
+                            </StackLayout>
+                            
+                            <StackLayout class="border-l-4 border-green-500 pl-3">
+                                <Label text="Academic Supervision" class="font-semibold text-gray-800" />
+                                <Label text="Project conducted under faculty guidance with institutional oversight" 
+                                       class="text-sm text-gray-600" textWrap="true" />
+                            </StackLayout>
+                            
+                            <StackLayout class="border-l-4 border-green-500 pl-3">
+                                <Label text="No Distribution" class="font-semibold text-gray-800" />
+                                <Label text="Code and techniques remain within academic context, not publicly distributed" 
+                                       class="text-sm text-gray-600" textWrap="true" />
+                            </StackLayout>
+                        </StackLayout>
+                    </StackLayout>
+
+                    <StackLayout class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                        <Label text="🔒 Security Implications" class="text-xl font-bold text-gray-800 mb-3" />
+                        
+                        <Label text="This research highlights important security considerations:" 
+                               class="text-gray-600 mb-3" textWrap="true" />
+                        
+                        <StackLayout class="space-y-2">
+                            <Label text="• Camera access controls in modern Android versions" 
+                                   class="text-gray-700" textWrap="true" />
+                            <Label text="• Importance of hardware-backed security features" 
+                                   class="text-gray-700" textWrap="true" />
+                            <Label text="• Root detection mechanisms and their limitations" 
+                                   class="text-gray-700" textWrap="true" />
+                            <Label text="• Media integrity verification in sensitive applications" 
+                                   class="text-gray-700" textWrap="true" />
+                        </StackLayout>
+                    </StackLayout>
+
+                    <StackLayout class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                        <Label text="📋 Compliance Statement" class="text-xl font-bold text-gray-800 mb-3" />
+                        
+                        <StackLayout class="bg-blue-50 border border-blue-200 rounded p-3">
+                            <Label text="This project complies with:" class="text-blue-800 font-semibold mb-2" />
+                            <Label text="• University academic integrity policies" class="text-blue-700" />
+                            <Label text="• Computer science ethical guidelines" class="text-blue-700" />
+                            <Label text="• Legal requirements for educational research" class="text-blue-700" />
+                            <Label text="• Industry best practices for responsible disclosure" class="text-blue-700" />
+                        </StackLayout>
+                    </StackLayout>
+                </StackLayout>
+            </ScrollView>
+        </TabViewItem>
+    </TabView>
+</Page>
