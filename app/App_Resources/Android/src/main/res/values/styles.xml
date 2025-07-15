@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-   
-    <style name="LaunchScreenTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <!-- Theme for splash screen -->
+    <style name="LaunchScreenTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:background">@android:color/white</item>
     </style>
 
-    
+    <!-- Base App Theme -->
     <style name="AppThemeBase" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowNoTitle">true</item>
+        <item name="colorPrimary">@android:color/holo_blue_light</item>
+        <item name="colorPrimaryDark">@android:color/holo_blue_dark</item>
+        <item name="colorAccent">@android:color/holo_green_light</item>
     </style>
 
-    <style name="NativeScriptToolbarStyleBase" parent="Widget.MaterialComponents.Toolbar">
-        <item name="android:background">?attr/colorPrimary</item>
-        <item name="titleTextColor">?attr/textColorPrimary</item>
-    </style>
-
+    <style name="NativeScriptToolbarStyleBase" parent="ThemeOverlay.MaterialComponents.ActionBar" />
 </resources>
